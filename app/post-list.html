@@ -1,0 +1,54 @@
+﻿<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../post-service/post-service.html">
+<link rel="import" href="post-card.html">
+
+<!-- attributes="show" attribute creates a published property named show. Published properties support two-way data binding http://www.polymer-project.org/docs/polymer/polymer.html#published-properties -->
+<polymer-element name="post-list" attributes="show">
+  <!-- Each Custom Element can only have one direct <template> descendant but this <template> can have multiple nested <template>s -->
+  <template>
+    <style>
+    :host {
+      display: block;
+      width: 100%;
+    }
+    post-card {
+      margin-bottom: 30px;
+    }
+    </style>
+    
+    <!-- posts="{{posts}}" attribute adds a two-way data binding between the <post-service> element and your custom element -->
+    <post-service id="service" posts="{{posts}}"></post-service>
+      <div layout vertical center>
+        <!-- repeat="{{post in posts}}", tells the template to create a new instance for each item in the posts array (a loop) -->
+        <template repeat="{{post in posts}}">
+          <!-- favorite="⁠{{post.favorite}}" binds the card's favorite value to the value in the array owned by the <post-service> -->
+          <!-- on-favorite-tap attribute sets up a handler for the  favorite-tap event fired by the <post-card> -->
+          <!-- hidden?="{{}}" expression is special syntax for a boolean attribute, which sets the attribute if the binding expression evaluates to true -->
+          <post-card
+            favorite="{{post.favorite}}"
+            on-favorite-tap="{{handleFavorite}}"
+            hidden?="{{show == 'favorites' && !post.favorite}}">
+            <!-- Child elements are distributed into the <post-card> element's insertion points. These can be added in any order here as the element order and structure is defined in the component template -->
+            <!-- In each template instance, the individual bindings (such as {{post.avatar}}) are replaced by the corresponding values for that item -->
+            <img src="{{post.avatar}}" width="70" height="70">
+            <h2>{{post.username}}</h2>
+            <p>{{post.text}}</p>
+          </post-card>
+        </template>
+      </div>
+    
+  </template>
+
+  <script>
+  Polymer({
+    handleFavorite: function(event, detail, sender) {
+      // sender.templateInstance.model is a reference to the model data used to construct a template instance. In this case, it includes the post object used to create a <post-card>, so you can retrieve its ID and favorite value
+      var post = sender.templateInstance.model.post;
+      // Every element in a custom element's shadow DOM that has an id attribute is added to the this.$ dictionary. This is called automatic node finding http://www.polymer-project.org/docs/polymer/polymer.html#automatic-node-finding
+      this.$.service.setFavorite(post.uid, post.favorite);
+      // In a real app, a push to the server would be made within the setFavorite method of post-service.html
+    }
+  });
+  </script>
+
+</polymer-element>

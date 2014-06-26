@@ -1,0 +1,88 @@
+﻿<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-icon-button/core-icon-button.html">
+<link rel="import" href="../components/paper-icon-button/paper-icon-button.html">
+
+<polymer-element name="post-card">
+  <!-- <template> tag defines the element's internal DOM structure aka Shadow DOM - all markup for the Custom Element goes here http://www.polymer-project.org/platform/shadow-dom.html  -->
+  <template>
+    <style>
+    /* Inside the Shadow DOM, the :host pseudo class matches the element that hosts the tree - ie the Custom Element itself */
+    :host {
+      display: block;
+      position: relative;
+      background-color: white;
+      padding: 20px;
+      width: 100%;
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+    .card-header {
+      margin-bottom: 10px;
+    }
+
+    /* For browsers that don't support Shadow DOM, the polyfill-next-selector tells the SDOM polyfill how to transform the ::content rule into a non-shadow DOM rule*/
+    polyfill-next-selector { content: ".card-header h2"; }
+    /* You can’t style the insertion point itself, so the ::content pseudo element is always used with a descendent selector */
+    .card-header ::content h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 300;
+    }
+    polyfill-next-selector { content: ".card-header img"; }
+    .card-header ::content img {
+      width: 70px;
+      border-radius: 50%;
+      margin: 10px;
+    }
+
+    core-icon-button {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+    }
+    core-icon-button {
+      fill: #636363;
+    }
+    /* The :host([favorite]) core-icon-button selector sets the fill color when the favorite attribute is set on the custom element */
+    :host([favorite]) core-icon-button {
+      fill: #da4336;
+    }
+    </style>
+
+    <!-- The layout horizontal center attributes are Polymer shorthand to create a flexbox layout -->
+    <div class="card-header" layout horizontal center>
+      <!-- The <content> elements create insertion points for the template's content. So all <img> children of the <post-card> element will be inserted at this point. This is referred to as 'distribution' -->
+      <content select="img"></content>
+      <content select="h2"></content>
+    </div>
+
+    <strong>
+      <!-- <core-icon-button> is a button component with embedded icon, which is customisable through the icon attribute -->
+      <!-- on-tap="⁠{{favoriteTapped}}" attribute specifies a method to call on the post-card element when the button is tapped -->
+      <core-icon-button
+        id="favicon"
+        icon="favorite"
+        on-tap="{{favoriteTapped}}">
+      </core-icon-button>
+    </strong>
+    <!-- A <content> tag with no select attribute selects any nodes that haven't already been inserted. -->
+    <content></content>
+    
+  </template>
+  <!-- Polymer() call registers the element so it's recognized by the browser -->
+  <script>
+  Polymer({
+    // The publish object is another way to specify published properties, like the attributes attribute in post-list.html
+    publish: {
+      favorite: {
+        value: false,
+        reflect: true // this means the favorite attribute is updated whenever the property value changes ie. 2way data binding
+      }
+    },
+    favoriteTapped: function(event, detail, sender) {
+      this.favorite = !this.favorite; // toggle state of this.favourite
+      this.fire('favorite-tap'); // fires a custom event, using the built in fire method - one of several utility methods added to the prototye of Custom Elements by Polymer
+    }
+  });
+  </script>
+</polymer-element>
